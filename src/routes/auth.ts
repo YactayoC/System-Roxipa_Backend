@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { getAllUsers, login, register } from '../controllers/auth';
+import { login, register } from '../controllers/auth';
+import { validatorFieldsLogin, validatorFieldsRegister } from '../middleware/fieldsValidator';
 
 const authRouter = Router();
 
-authRouter.post("/login", login)
-authRouter.post("/register", register)
-authRouter.get("/get-users", getAllUsers)
+authRouter.post('/login', validatorFieldsLogin, login);
+authRouter.post('/register', validatorFieldsRegister, register);
 
 export default authRouter;

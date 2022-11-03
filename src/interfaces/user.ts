@@ -1,6 +1,7 @@
 type Role = 'Client' | 'Adnin';
 
-export interface User {
+export interface IUser {
+  _id: string;
   email: string;
   password: string;
   role: Role;
@@ -8,7 +9,7 @@ export interface User {
   key: string;
 }
 
-export interface UserLogin {
+export interface IUserAuth {
   email: string;
   password: string;
 }
