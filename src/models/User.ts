@@ -6,7 +6,7 @@ import { generateKey } from '../utils';
 
 const userSchema = new Schema(
   {
-    ruc: {
+    email: {
       type: String,
       required: true,
       unique: true,
