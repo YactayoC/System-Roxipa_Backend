@@ -1,24 +1,31 @@
 import { Request, Response } from 'express';
-import { loginDB } from '../services/auth';
+import { registerClientDB } from '../services/client';
+import { getUserByEmail, registerUserDB } from '../services/user';
+import { sendEmail } from '../utils';
 
 const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
-  const dataLogin = await loginDB({ email, password });
-
-  res.status(201).json({ msg: 'Okey', data: dataLogin, hasError: false });
-};
-
-const register = (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  loginDB({ email, password });
-
+  console.log(email, password);
   res.status(201).json({ msg: 'Okey', hasError: false });
 };
 
-const getAllUsers = (_req: Request, res: Response) => {
-  const users = ['user1', 'user2', 'user3'];
-  console.log(users);
-  res.status(200).json({ users, hasError: false });
+const register = async (req: Request, res: Response) => {
+  const { email, password, ...dataClient } = req.body;
+
+  try {
+    const existsUser = await getUserByEmail(email);
+
+    if (existsUser) {
+      return res.status(400).json({ hasError: true, msg: 'User already exists' });
+    }
+
+    const user = await registerUserDB({ email, password });
+    const client = await registerClientDB({ ...dataClient, user: user._id });
+    await sendEmail(user.email, client.fullname, user.key);
+    return res.status(201).json({ hasError: false, msg: 'User registered successfully' });
+  } catch (error) {
+    return res.status(500).json({ hasError: true, msg: 'Internal server error' });
+  }
 };
 
-export { login, register, getAllUsers };
+export { login, register };
