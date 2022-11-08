@@ -20,8 +20,10 @@ const register = async (req: Request, res: Response) => {
 
     const user = await registerUserDB({ email, password });
     const client = await registerClientDB({ ...dataClient, user: user._id });
+    console.log(user, client);
     return res.status(201).json({ hasError: false, msg: 'User registered successfully' });
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ hasError: true, msg: 'Internal server error' });
   }
 };
