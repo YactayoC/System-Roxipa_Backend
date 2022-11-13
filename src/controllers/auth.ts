@@ -1,20 +1,14 @@
 import { Request, Response } from 'express';
-import { registerClientDB } from '../services/client';
-import { getUserByEmail, registerUserDB } from '../services/user';
+
+import { getClientByIdUserDB, registerClientDB } from '../services/client';
+import { confirmUserDB, getUserByEmailDB, getUserByKeyDB, registerUserDB } from '../services/user';
 import { sendEmail, generateJWT, comparePassword } from '../utils';
 
-const profile = async (req: Request, res: Response) => {
-  const { uid, name } = req.body;
-  console.log(req.userId, 'aca en el controlador profile tienes tu token')
-  
-  return res.status(200).json({ hasError: false, uid, name });
-};
-
-const login = async (req: Request, res: Response) => {
+const authLogin = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
-    const user = await getUserByEmail(email);
+    const user = await getUserByEmailDB(email);
 
     if (!user) {
       return res.status(404).json({ hasError: true, msg: 'User not found' });
@@ -23,19 +17,20 @@ const login = async (req: Request, res: Response) => {
     if (!comparePassword(password, user.password)) {
       return res.status(400).json({ hasError: true, msg: 'Invalid password' });
     }
-    //generar token
-    const token = await generateJWT(user._id, user.email);
-    return res.status(200).json({ hasError: false, token, user });
+
+    const client = await getClientByIdUserDB(user._id);
+    const token = await generateJWT(user._id, user.email, client!.fullname);
+    return res.status(200).json({ hasError: false, token, client });
   } catch (error) {
     return res.status(500).json({ hasError: true, msg: 'Internal server error' });
   }
 };
 
-const register = async (req: Request, res: Response) => {
+const authRegister = async (req: Request, res: Response) => {
   const { email, password, ...dataClient } = req.body;
 
   try {
-    const existsUser = await getUserByEmail(email);
+    const existsUser = await getUserByEmailDB(email);
 
     if (existsUser) {
       return res.status(400).json({ hasError: true, msg: 'User already exists' });
@@ -50,4 +45,25 @@ const register = async (req: Request, res: Response) => {
   }
 };
 
-export { login, register, profile};
+const authConfirmUser = async (req: Request, res: Response) => {
+  const { key } = req.params;
+
+  try {
+    const user = await getUserByKeyDB(key);
+
+    if (!user) {
+      return res.status(404).json({ hasError: true, msg: 'User not found' });
+    }
+
+    if (user.isConfirm) {
+      return res.status(400).json({ hasError: true, msg: 'User already confirmed' });
+    }
+
+    await confirmUserDB(user._id);
+    return res.status(200).json({ hasError: false, msg: 'User confirmed successfully' });
+  } catch (error) {
+    return res.status(500).json({ hasError: true, msg: 'Internal server error' });
+  }
+};
+
+export { authLogin, authRegister, authConfirmUser };
