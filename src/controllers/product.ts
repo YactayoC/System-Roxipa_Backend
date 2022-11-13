@@ -1,31 +1,32 @@
 import { Request, Response } from 'express';
-import { registerClientDB } from '../services/client';
-import { getUserByEmail, registerUserDB } from '../services/user';
+import { getProductByIdDB, getProductsDB } from '../services/product';
 
-const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  console.log(email, password);
-  res.status(201).json({ msg: 'Okey', hasError: false });
-};
-
-const register = async (req: Request, res: Response) => {
-  const { email, password, ...dataClient } = req.body;
-
+const getProducts = async (_req: Request, res: Response) => {
   try {
-    const existsUser = await getUserByEmail(email);
-
-    if (existsUser) {
-      return res.status(400).json({ hasError: true, msg: 'User already exists' });
-    }
-
-    const user = await registerUserDB({ email, password });
-    const client = await registerClientDB({ ...dataClient, user: user._id });
-    console.log(user, client);
-    return res.status(201).json({ hasError: false, msg: 'User registered successfully' });
+    const products = await getProductsDB();
+    return res.status(201).json({ hasError: false, products });
   } catch (error) {
-    console.error(error);
     return res.status(500).json({ hasError: true, msg: 'Internal server error' });
   }
 };
 
-export { login, register };
+const getProduct = async (req: Request, res: Response) => {
+  const { idProduct } = req.params;
+
+  try {
+    const product = await getProductByIdDB(idProduct);
+
+    if (!product) {
+      return res.status(404).json({
+        hasError: true,
+        message: 'Product not found',
+      });
+    }
+
+    return res.status(201).json({ hasError: false, product });
+  } catch (error) {
+    return res.status(500).json({ hasError: true, msg: 'Internal server error' });
+  }
+};
+
+export { getProducts, getProduct };

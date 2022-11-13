@@ -1,3 +1,4 @@
 export * from './client';
-export * from './user';
 export * from './payloadJWT';
+export * from './product';
+export * from './user';
