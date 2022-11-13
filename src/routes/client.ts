@@ -1,8 +1,10 @@
 import { Router } from 'express';
 
 import { validatorIdClient } from '../middleware';
-import { getClientByIdDB } from '../services/client';
+import { getClient, getClients } from '../controllers/client';
+
 
 export const clientRouter = Router();
 
-clientRouter.get('/get-client', validatorIdClient, getClientByIdDB);
+clientRouter.get('/get-clients', getClients);
+clientRouter.get('/get-client/:idClient', validatorIdClient, getClient);
