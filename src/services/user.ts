@@ -15,14 +15,14 @@ export const registerUserDB = async (dataRegister: IUserAuth): Promise<IUser> =>
 export const getUserByEmailDB = async (email: string): Promise<IUser | null> => {
   const user = await User.findOne({ email });
   return user;
-}
+};
 
 export const getUserByKeyDB = async (key: string): Promise<IUser | null> => {
   const user = await User.findOne({ key });
   return user;
-}
+};
 
 export const confirmUserDB = async (id: string): Promise<IUser | null> => {
   const user = await User.findByIdAndUpdate(id, { isConfirm: true }, { new: true });
   return user;
-}
+};

@@ -7,3 +7,10 @@ export interface IProduct {
   stock: number;
   category: Category;
 }
+
+export interface IUpdateProduct {
+  name?: string;
+  price?: number;
+  stock?: number;
+  category?: Category;
+}

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getProductByIdDB, getProductsDB } from '../services/product';
+import { deleteProductDB, getProductByIdDB, getProductsDB, updateProductDB } from '../services/product';
 
 const getProducts = async (_req: Request, res: Response) => {
   try {
@@ -29,4 +29,27 @@ const getProduct = async (req: Request, res: Response) => {
   }
 };
 
-export { getProducts, getProduct };
+const updateProduct = async (req: Request, res: Response) => {
+  const { idProduct } = req.params;
+  const { ...data } = req.body;
+
+  try {
+    const product = await updateProductDB(idProduct, data);
+    return res.status(200).json({ hasError: false, product, msg: 'Product updated' });
+  } catch (error) {
+    return res.status(500).json({ hasError: true, msg: 'Internal server error' });
+  }
+};
+
+const deleteProduct = async (req: Request, res: Response) => {
+  const { idProduct } = req.params;
+
+  try {
+    const product = await deleteProductDB(idProduct);
+    return res.status(200).json({ hasError: false, product, msg: 'Product deleted' });
+  } catch (error) {
+    return res.status(500).json({ hasError: true, msg: 'Internal server error' });
+  }
+};
+
+export { getProducts, getProduct, updateProduct, deleteProduct };

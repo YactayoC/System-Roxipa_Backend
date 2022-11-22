@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import type { ConnectOptions } from 'mongoose';
 import { dbConnectionCache } from './dbConnection';
 
-// const MONGODB_URI = "mongodb+srv://grouptu:bd123@cluster0.l2z51d0.mongodb.net/roxipa";
 const errorMessage = 'Please define the MONGODB_URL environment variable';
 
 declare global {

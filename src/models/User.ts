@@ -3,7 +3,6 @@ import { IUser } from '../interfaces';
 
 import { generateKey } from '../utils';
 
-
 const userSchema = new Schema(
   {
     email: {
